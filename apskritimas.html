@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>
+			apskritimas
+		</title>
+		</head>
+		<style>
+			.reiksmes {
+				display: none;
+			}
+		</style>
+		<script>
+			
+			var divai_reiksmiu = [ 'reiksmes_daugiakampio', 'reiksmes_apskritimo' ]; 
+		
+			function taskas ( x, y ) {
+				
+				this.x = x;
+				this.y = y;
+			}
+			
+			function figura( z_index, divas_reiksmiu ) {
+			
+				this.z_index = z_index;
+				this.divas_reiksmiu = divas_reiksmiu;
+				
+				this.draw = function() {
+										// rez.innerHTML += 'netureciau veikti, bet veikiu<br>';
+				}
+				
+				this.uzrasyti = function() {
+				
+					return ' sluoksnis: ' +  this.z_index + ' reiksmiu skydelis: ' + this.divas_reiksmiu;
+				}
+				
+				this.showDivasReiksmiu = function() {
+				
+					document.getElementById ( this.divas_reiksmiu ).style.display = 'block';						
+				
+					for ( i = 0; i < divai_reiksmiu.length; i++)  {
+					
+						if ( divai_reiksmiu [ i ] != this.divas_reiksmiu ) {
+					
+							document.getElementById ( divai_reiksmiu [ i ] ).style.display = 'none';						
+						}
+					}
+				}
+			}			
+			
+			function piesimas ( piesimo_sritis, rez, saraso_sritis ) {
+			
+				this.piesimo_srits  = piesimo_sritis;
+				this.saraso_sritis = saraso_sritis;
+				this.rez = rez;
+			
+				this.std_figuros = {
+				
+					apskritimas: new apskritimas ( 0, 0, 0, 0, 'reiksmes_apskritimo' )
+					, daugiakampis: new daugiakampis ( '', 0, 'reiksmes_daugiakampio' )
+				};
+			
+				this.figuros = [];
+				
+				this.prideti  = function ( figura1 ) {
+				
+					this.figuros.push ( figura1 );
+				}
+				
+				this.piesti = function() {
+															// rez.innerHTML +=  this.figuros.length + '<br>';
+					for (z = 0; z < 5; z++) {
+																	// rez.innerHTML += 'z: ' + z + '<br>';
+						for ( i = 0; i < this.figuros.length; i++ ) {
+															/*						
+																rez.innerHTML +=
+																	'i: ' + i 
+																	+ ' z-index: -' + this.figuros [ i ].z_index + '-'
+																	+ '<br>'
+																;
+															*/
+							if ( parseInt (this.figuros [ i ].z_index ) == z ) {
+							
+															//	rez.innerHTML += '--- piešiam <br>';
+								this.figuros [ i ].draw();
+							}
+						}
+					}
+				}
+				this.surasyti= function() {
+				
+					this.saraso_sritis.innerHTML = '';
+				
+					for (i = 0; i < this.figuros.length; i++ ) {
+					
+						this.saraso_sritis.innerHTML += this.figuros[ i ].uzrasyti();
+					}
+				}
+			}			
+			
+
+			var piesinys;
+			
+			function pradetiClick() {
+			
+				var c = document.getElementById("molbertas");
+				piesimo_srits = c.getContext("2d");
+				document.getElementById("perpiesti" ).disabled = false;				
+				document.getElementById("show_reiksmes_apskritimo" ).disabled = false;
+				document.getElementById("show_reiksmes_daugiakampio" ).disabled = false;
+				
+				rez = document.getElementById("rez" );
+				sarasas = document.getElementById ( "sarasas" );
+				piesinys = new piesimas( piesimo_srits, rez, sarasas);
+			}
+			
+			function apskritimas ( x, y, radius, z_index, divas_reiksmiu ) {
+				
+							
+				this.x =  x;
+				this.y =  y;
+				this.radius = radius;
+				
+				this.z_index = z_index;
+				this.divas_reiksmiu = divas_reiksmiu;
+			}
+			apskritimas.prototype =  new figura; // ( z_index, divas_reiksmiu ); 	
+			
+			apskritimas.prototype.draw = function () {
+			
+				piesinys.piesimo_srits.beginPath();
+				piesinys.piesimo_srits.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+				piesinys.piesimo_srits.stroke();
+				piesinys.piesimo_srits.fillStyle = 'rgba(0,255,0,1)'; 
+				piesinys.piesimo_srits.fill();
+										// rez.innerHTML += 'nupiešiau ! apskritimą<br>';
+			}
+
+			apskritimas.prototype.uzrasyti  = function () {
+			
+				return 
+				
+						'apskritimas: '
+						+ ' koordinates (x,y): ' // + this.x + this.y 
+						+ ' spindulys: ' // + this.radius
+						// + ' ' + figura.uzrasyti()
+					;
+			}
+			
+			function daugiakampis ( taskai, z_index, divas_reiksmiu ) {
+			
+				this.tasku_masyvas = [];  
+				
+				for ( i = 0; i < taskai.length; i+=2 ) {
+				
+					this.tasku_masyvas.push (
+						new taskas ( parseInt ( taskai [ i ] ), parseInt ( taskai [ i + 1 ] ) )
+					);
+				}
+				this.z_index = z_index;
+				this.divas_reiksmiu = divas_reiksmiu;
+			}
+			daugiakampis.prototype = new figura;
+			
+			daugiakampis.prototype.draw = function() {
+															//		tasku_masyvas_str = "";				
+				piesinys.piesimo_srits.moveTo ( this.tasku_masyvas [ 0 ].x, this.tasku_masyvas [ 0 ].y );
+				
+				for( i=1; i< this.tasku_masyvas.length; i++ ) {
+															// 	tasku_masyvas_str += "x" + i + " "  + tasku_masyvas [ i ].x + " y" + i + " "  + tasku_masyvas [ i ].y + "\n";					
+					piesinys.piesimo_srits.lineTo (  this.tasku_masyvas [ i ].x, this.tasku_masyvas [ i ].y  );
+				}
+				piesinys.piesimo_srits.closePath();
+				piesinys.piesimo_srits.stroke();	
+											// rez.innerHTML += 'nupiešiau ! daugiakampį<br>';				
+			}
+			
+			daugiakampis.prototype.uzrasyti  = function () {
+			
+				kampai = '';
+			
+				for (var  i = 0; i < this.tasku_masyvas.length; i+=1 ) {
+				
+					 kampai  += ' ( ' + tasku_masyvas [ i ].x + ' , ' + tasku_masyvas [ i ].y  +'  ) ';
+				}			
+			
+				return 
+				
+						'daugiakampis: '
+						+ ' kampai: ' + kampai
+						+ figura.uzrasyti()
+					;
+			}			
+			
+			/**
+			*                                Reakcijos į mygtukus arba įvykius
+			*/
+
+			function pagalTaskus () {
+			
+				taskai = document.getElementById ( "taskai" ).value.split( "," );
+				var z_index = parseInt ( document.getElementById ("z_index_daugiakampio").value );				
+				
+				daugiakamp = new daugiakampis ( taskai, z_index );
+				piesinys.prideti ( daugiakamp );
+				daugiakamp.draw();
+				piesinys.surasyti();				
+			}
+			
+			function apskritimasClick () {
+
+				var x = parseInt ( document.getElementById ("x").value );
+				var y = parseInt ( document.getElementById ("y").value );
+				var radius = parseInt ( document.getElementById ("radius").value );
+				var z_index = parseInt ( document.getElementById ("z_index_apskritimo").value );				
+				
+				apskritimas1 = new apskritimas (x, y, radius, z_index );	
+				piesinys.prideti ( apskritimas1 );				
+				apskritimas1.draw();
+				piesinys.surasyti();
+			}
+
+			function perpiestiClick () {
+			
+				piesinys.piesti();
+				piesinys.surasyti();
+			}
+
+			function show_apskritimas() {
+			
+									//alert ( piesinys.std_figuros.apskritimas.divas_reiksmiu );
+				piesinys.std_figuros.apskritimas.showDivasReiksmiu();
+			}
+			function show_daugiakampis() {
+			
+									// alert ( piesinys.std_figuros );
+									// alert ( piesinys.std_figuros.daugiakampis.divas_reiksmiu );
+				piesinys.std_figuros.daugiakampis.showDivasReiksmiu();
+			}			
+		</script>		
+		<body>
+		<canvas id="molbertas" width="400" height="200" style="border: 1px solid black">			
+		</canvas><br>
+		<input type="button" id="pradeti" onClick="pradetiClick()" value="pradeti">
+		<input type="button" id="perpiesti" onClick="perpiestiClick()" value="perpiesti" disabled>
+		<input type="button" id="show_reiksmes_apskritimo" onClick="show_apskritimas()" value="apskritimas" disabled>
+		<input type="button" id="show_reiksmes_daugiakampio" onClick="show_daugiakampis()" value="daugiakampis" disabled><br>
+		
+		<div id="reiksmes_apskritimo" class="reiksmes">
+			x reiksme :<br>
+			<input type="text" id="x" value="200"><br>
+			y reiksme:<br>
+			<input type="text" id="y" value="110"><br>
+			spindulys(radius):<br>
+			<input type="text" id="radius" value="60"><br>
+			z-index:<br>
+			<input type="text" id="z_index_apskritimo" value="0"><br>			
+			<input type="button" id="apskritimas" onClick="apskritimasClick()" value="apskritimas"><br>
+		</div>
+		<div id="reiksmes_daugiakampio" class="reiksmes">
+			taskai:<br>
+			<input type="text" id="taskai" style="width: 300px" value="10,10,200,200,100,40,150,60"><br>
+			<input type="text" id="z_index_daugiakampio" value="0"><br>			
+			<input type="button" id="pagal_taskus" onClick="pagalTaskus()" value="pagal taskus"><br>
+		</div>
+		<div id="sarasas">
+		</div>
+		<div id="rez">
+		</div>
+	</body>
+</html>
