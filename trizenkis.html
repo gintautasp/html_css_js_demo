@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>3 ženkliai skaiciai</title>
+	<style>
+		.radom {
+			background-color: green;
+		}
+		.neradom {
+			background-color: lightgrey;		
+		}
+	</style>
+	<script>
+		function skaiciuoti() {
+			
+			rez_str = '<table><tr><th>skaicius</th><th>sk1</th><th>sk2</th><th>sk3</th><th>sandauga</th><th>sandauga == skaicius</th></tr>';
+			
+			css_klase = '';
+			kiekis_tikrintu = 0;
+			kiekis_surastu = 0;
+		
+			for ( skaicius = 100; skaicius < 1000; skaicius++ ) {
+			
+				sk3 = skaicius % 10;					// paimama skaiciaus dalybos is 10 liekana -> sk3
+				sk12 = parseInt ( ( skaicius - sk3 ) / 10 );          // paimamas skaiciaus dalybos is 10 rezultatas -> sk12
+				sk2 = sk12 % 10;						// paimama sk12 dalybos is 10 liekana -> sk2
+				sk1 = parseInt ( ( sk12 - sk2 ) / 10 );		  // paimamas sk12 dalybos is 10 rezultatas -> sk1
+				sandauga =  sk1 * sk2 * sk3;
+				sand_lygi_skaic = sandauga == skaicius;
+				kiekis_tikrintu++;
+				
+				if ( sand_lygi_skaic )  {
+				
+					css_klase = ' class="radom"';
+					rez_str += '<tr' + css_klase + '><td>' + skaicius + '</td><td>' + sk1  + '</td><td>' + sk2 + '</td><td>' + sk3 + '</td><td>' + sandauga + '</td><td>' + sand_lygi_skaic + '</td></tr>';
+					kiekis_surastu++;
+					
+				} else {
+				
+					css_klase = ' class="neradom"';
+				}
+			}
+			rez_str += '</table>';
+			
+			rez_str += 'patikrinta ' + kiekis_tikrintu + ' skaičių, surasta ' + kiekis_surastu + ' skaičių<br>';
+
+			if (  kiekis_surastu == 0 ) {
+			
+				rez_str += 'ieškomų skaičių nesurasta<br>';
+			}
+
+			rez = document.getElementById ( 'rez' );
+			rez.innerHTML = rez_str;
+		}
+	</script>
+</head>
+<body>
+	<input  type="button" onClick="skaiciuoti()" value="skaičiuoti">
+	<div id="rez">
+	</div>
+</body>
+</html>
